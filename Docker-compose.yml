@@ -1,0 +1,41 @@
+services:
+  mysqldb:   
+    image: mysql:8
+    container_name: mysql-service
+    environment:
+      MYSQL_ROOT_PASSWORD: root    
+      MYSQL_DATABASE: userdbexam 
+    ports: 
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - springboot-mysql-net
+
+  backend:
+    image : ruchithavemula11/ansible-labexam-backend:latest 
+    container_name: ansiblebackend
+    ports:
+      - "30022:2000"
+    depends_on:
+      - mysqldb
+    restart: on-failure
+    networks:
+      - springboot-mysql-net
+
+  frontend:
+    image: ruchithavemula11/ansible-labexam-frontend:latest
+    container_name: ansiblefrontend
+    ports:
+      - "30021:80"
+    depends_on:
+      - backend
+    restart: on-failure
+    networks:
+      - springboot-mysql-net
+
+volumes:
+  mysql_data:
+
+networks:
+  springboot-mysql-net:
